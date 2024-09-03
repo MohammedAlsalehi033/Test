@@ -14,13 +14,11 @@ export const initializeUser = async (
   }
 
   const socityDoc = {
-    name,
     email: user.email,
-
   };
 
   try {
-    const docRef = collection(db, "Applications");
+    const docRef = collection(db, "");
     await addDoc(docRef, socityDoc);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
