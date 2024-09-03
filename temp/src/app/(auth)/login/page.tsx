@@ -16,14 +16,13 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      
       console.log("User Info:", user);
     } catch (error) {
       console.error("Error during Google login:", error);
     }
   };
-  if (auth) {
-    router.push("/dashboard");
-  }
+ 
 
   return (
     <div className="min-h-screen text-black flex flex-col justify-center items-center">
