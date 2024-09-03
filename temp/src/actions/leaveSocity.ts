@@ -7,10 +7,7 @@ const auth = getAuth();
 export const leaveSocity = async (
   socityRequestStates: Record<string, string> 
 ) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
+
 
   const socityDoc = {
     socityRequestStates  

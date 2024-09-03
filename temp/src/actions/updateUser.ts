@@ -5,10 +5,6 @@ import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 const auth = getAuth();
 
 export const updateSubscribedSocieties = async (socityId: string, requestState: string) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
 
   try {
     const userDocRef = doc(collection(db, "Users"), user.uid);

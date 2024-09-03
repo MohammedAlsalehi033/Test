@@ -1,32 +1,42 @@
-"use client"
-import React from 'react';
-import { initializeSocity } from "@/actions/initalizeSocity_Server"; // Adjust the path as needed
+'use client'
+import React, { useEffect, useState } from 'react';
+import { getUserById } from '@/actions/getUserByID'; // Adjust the path as needed
 
-const Page = () => {
-  const handleInitialize = async () => {
-    try {
-      // Call the initializeSocity function with the required parameters
-      await initializeSocity(
-        "test@example.com", // Replace with the actual email
-        "Society Name", // Replace with the actual name
-        {"user1@example.com": "user1@example.com", "user1@example5com": "pending" }, // Replace with actual users
-        ["event1", "event2"], // Replace with actual events
-        "This is a sample description", // Replace with actual description
-        ["tag1", "tag2"], // Replace with actual tags
-        ["image1.jpg", "image2.jpg"] // Replace with actual image URLs
-      );
-      console.log('Society initialized successfully');
-    } catch (error) {
-      console.error('Error initializing society:', error);
-    }
-  };
+const Testing = () => {
+  const [userData, setUserData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const email = "test"; // Replace with the actual email you want to search by
+        const data = await getUserById(email);
+        setUserData(data);
+      } catch (error) {
+        setError('Error fetching user data: ' + error.message);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <div>
-      <h1>Initialize Society</h1>
-      <button onClick={handleInitialize}>Initialize</button>
+      <h1>Testing Component</h1>
+      {error && <p>{error}</p>}
+      <ul>
+        {userData && userData.length > 0 ? (
+          userData.map((user) => (
+            <li key={user.id}>
+              <strong>{user.type}</strong>: {user.email}
+            </li>
+          ))
+        ) : (
+          <p>No user data found.</p>
+        )}
+      </ul>
     </div>
   );
 };
 
-export default Page;
+export default Testing;

@@ -5,11 +5,10 @@ import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 const auth = getAuth();
 
 export const getEventById = async (eventID: string) => {
-    const docRef = collection(db, "Applications");
 
     try {
         
-      const docRef = doc(db, "Events", eventID);
+      const docRef = doc(db, "events", eventID);
       const eventSnapshot = await getDoc(docRef);
   
       if (eventSnapshot.exists()) {
