@@ -19,7 +19,7 @@ export const joinSocity = async (
   };
 
   try {
-    const docRef = collection(db, "Applications");
+    const docRef = collection(db, "user");
     await addDoc(docRef, socityDoc);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {

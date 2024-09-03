@@ -12,6 +12,8 @@ export const getAllSocieties = async () => {
     const societiesCollection = collection(db, "society");
     const societiesSnapshot = await getDocs(societiesCollection);
     const societiesList = societiesSnapshot.docs.map(doc => ({
+
+        
       ...doc.data()
     }));
 
