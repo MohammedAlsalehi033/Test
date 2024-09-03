@@ -8,7 +8,7 @@ type Props = {}
 const header = (props: Props) => {
   return (
     <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Link href="#" className="flex items-center justify-center" prefetch={false}>
+        <Link href="/" className="flex items-center justify-center" prefetch={false}>
           <UniversityIcon className="h-6 w-6" />
           <span className="sr-only">Campus Connect</span>
         </Link>
