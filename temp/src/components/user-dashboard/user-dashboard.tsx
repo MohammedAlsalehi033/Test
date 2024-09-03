@@ -7,10 +7,17 @@ import { useAuth } from "@/Hooks/useAuth";
 import { auth } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
+import { getAllSocieties } from "@/actions/getSocietis";
 
 interface Club {
-  id: number;
+  id: string;
   name: string;
+  description: string;
+  email: string;
+  events: string[];
+  img: string[];
+  tags: string[];
+  users: { [key: string]: string };
 }
 
 interface Event {
@@ -19,17 +26,18 @@ interface Event {
   date: string;
 }
 
-const Dashboard: React.FC = ({}) => {
+const Dashboard: React.FC = () => {
   const user = useAuth(auth);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [loading, setLoading] = useState(true); // Initialize loading to true
+  const [loading, setLoading] = useState(true);
+  const [societies, setSocieties] = useState<Club[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  console.log(user);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push("/login"); // Redirect to login after sign out
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -37,40 +45,62 @@ const Dashboard: React.FC = ({}) => {
 
   useEffect(() => {
     if (user === undefined) {
-      setLoading(true); // Keep loading if user is still being fetched
+      setLoading(true);
     } else if (user === null) {
-      router.push("/login"); // Redirect to login if user is null (logged out)
+      router.push("/login");
     } else {
-      setLoading(false); // Stop loading once user is fetched
+      setLoading(false);
     }
   }, [user, router]);
 
-  // Render loading screen while loading is true
+  useEffect(() => {
+    const fetchSocieties = async () => {
+      try {
+        const fetchedSocieties = await getAllSocieties();
+        // Ensure all societies have the required properties
+        const validSocieties = fetchedSocieties.filter((society): society is Club => {
+          return !!society.id && !!society.name && !!society.description && !!society.email &&
+                 Array.isArray(society.events) && Array.isArray(society.img) &&
+                 Array.isArray(society.tags) && typeof society.users === 'object';
+        });
+        setSocieties(validSocieties);
+      } catch (error) {
+        console.error("Error fetching societies:", error);
+        setError("Failed to load societies. Please try again later.");
+      }
+    };
+  
+    fetchSocieties();
+  }, []);
+  
+
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <div className="loader">Loading...</div>{" "}
+        <div className="loader">Loading...</div>
       </div>
     );
   }
 
-  const clubs: Club[] = [
-    { id: 1, name: "Club 1" },
-    { id: 2, name: "Club 2" },
-  ];
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
+  const filteredSocieties = societies.filter((society) =>
+    society.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
+  );
+  
   const upcomingEvents: Event[] = [
     { id: 1, name: "Event 1", date: "2024-09-10" },
     { id: 2, name: "Event 2", date: "2024-09-12" },
   ];
 
-  const filteredClubs = clubs.filter((club) =>
-    club.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="p-6 bg-gradient-to-r from-blue-[75] to-blue-50 min-h-screen flex flex-col items-center">
-      {/* Page Title */}
       <div className="w-full flex justify-between items-center mb-4">
         <h1 className="text-4xl font-bold text-blue-800">
           Welcome {user?.displayName}
@@ -84,11 +114,9 @@ const Dashboard: React.FC = ({}) => {
       </div>
 
       <p className="text-lg text-gray-600 mb-8">
-        Manage your clubs, explore activities, and stay updated with upcoming
-        events.
+        Manage your clubs, explore activities, and stay updated with upcoming events.
       </p>
 
-      {/* Search Bar */}
       <div className="relative mb-6 w-full max-w-md">
         <Input
           placeholder="Search clubs and activities..."
@@ -99,11 +127,7 @@ const Dashboard: React.FC = ({}) => {
         <Search className="absolute top-2 left-3 text-gray-400" />
       </div>
 
-      {/* Dashboard Sections */}
-      <Tabs
-        defaultValue="registered-clubs"
-        className="w-full max-w-4xl bg-white"
-      >
+      <Tabs defaultValue="registered-clubs" className="w-full max-w-4xl bg-white">
         <TabsList className="flex bg-blue-200">
           <TabsTrigger
             value="registered-clubs"
@@ -126,15 +150,15 @@ const Dashboard: React.FC = ({}) => {
           <p className="text-gray-600 mb-4">
             These are the clubs you are a part of. Stay active and engaged!
           </p>
-          {filteredClubs.map((club) => (
+          {filteredSocieties.map((society) => (
             <div
-              key={club.id}
+              key={society.id}
               className="p-6 bg-white shadow-lg flex items-center justify-between"
             >
               <div>
-                <p className="text-xl font-bold text-blue-800">{club.name}</p>
+                <p className="text-xl font-bold text-blue-800">{society.name}</p>
                 <p className="text-sm text-gray-500">
-                  Explore this club and its activities.
+                  Explore this society and its activities.
                 </p>
               </div>
               <button className="bg-blue-500 text-white px-4 py-2 shadow">
