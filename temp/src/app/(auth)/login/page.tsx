@@ -1,28 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stepper, Step } from "@/components/Stepper";
 import { Button } from "@/components/ui/button";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/Hooks/useAuth";
 
 export default function Login() {
   const [step, setStep] = useState(0);
   const provider = new GoogleAuthProvider();
   const router = useRouter();
+  const user = useAuth(auth);
+
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard");
+    }
+  }, [user]);
 
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      
+
       console.log("User Info:", user);
     } catch (error) {
       console.error("Error during Google login:", error);
     }
   };
- 
 
   return (
     <div className="min-h-screen text-black flex flex-col justify-center items-center">
