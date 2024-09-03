@@ -5,16 +5,14 @@ import { collection, addDoc } from "firebase/firestore";
 const auth = getAuth();
 
 export const joinSocity = async (
-  socityRequestStates: Record<string, string>  // New parameter: map of socityId and requestStates
+  socityRequestStates: Record<string, string> 
 ) => {
   const user = auth.currentUser;
   if (!user) {
     throw new Error("User not authenticated");
   }
 
-  const socityDoc = {
-    name,
-    email: user.email,
+  const userDoc = {
     socityRequestStates  
   };
 
