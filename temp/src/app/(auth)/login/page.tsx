@@ -3,9 +3,27 @@
 import { useState } from "react";
 import { Stepper, Step } from "@/components/Stepper";
 import { Button } from "@/components/ui/button";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [step, setStep] = useState(0);
+  const provider = new GoogleAuthProvider();
+  const router = useRouter();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("User Info:", user);
+    } catch (error) {
+      console.error("Error during Google login:", error);
+    }
+  };
+  if (auth) {
+    router.push("/dashboard");
+  }
 
   return (
     <div className="min-h-screen text-black flex flex-col justify-center items-center">
@@ -14,14 +32,22 @@ export default function Login() {
       <Stepper currentStep={step}>
         <Step title="Select Role">
           <div className="flex flex-col space-y-4">
-            <Button>Login</Button>
+            <Button onClick={() => setStep(1)}>Login as Admin</Button>
+            <Button onClick={() => setStep(1)}>Login as User</Button>
           </div>
         </Step>
 
-        <Step title="Login as with google">
-          <form className="space-y-4">
-            <Button>Login with Google</Button>
-          </form>
+        <Step title="Login with Google">
+          <div className="gap-3 flex">
+            <Button onClick={handleGoogleLogin}>Login with Google</Button>
+
+            <Button
+              onClick={() => setStep(0)}
+              className="bg-gray-200 hover:bg-gray-300"
+            >
+              Cancel
+            </Button>
+          </div>
         </Step>
       </Stepper>
 

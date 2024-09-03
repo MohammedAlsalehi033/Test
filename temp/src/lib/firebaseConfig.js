@@ -10,7 +10,7 @@ const firebaseConfig = {
   projectId: "linkyoutask-9b530",
   storageBucket: "linkyoutask-9b530.appspot.com",
   messagingSenderId: "263472760147",
-  appId: "1:263472760147:web:a82e6c6a4de31b3e18cda6"
+  appId: "1:263472760147:web:a82e6c6a4de31b3e18cda6",
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -19,4 +19,4 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 export const auth = getAuth(app);
 
-export { db, firebaseConfig };
+export { db, firebaseConfig, app };
