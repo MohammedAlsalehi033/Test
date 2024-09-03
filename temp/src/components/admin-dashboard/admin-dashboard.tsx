@@ -1,5 +1,8 @@
-'use client'
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/Hooks/useAuth";
+import { auth } from "@/lib/firebaseConfig";
+import { useRouter } from "next/navigation";
 
 // Placeholder for Firebase data fetch function
 const fetchSocietyData = async () => {
@@ -8,12 +11,19 @@ const fetchSocietyData = async () => {
 };
 
 const Dashboard: React.FC = () => {
+  const router = useRouter();
+  const user = useAuth(auth);
+  useEffect(() => {
+    if (user === null) {
+    }
+  }, [user, router]);
+
   const [society, setSociety] = useState<{ name: string | null } | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
+    name: "",
+    description: "",
     image: null as File | null,
-    tags: ''
+    tags: "",
   });
 
   useEffect(() => {
@@ -24,7 +34,9 @@ const Dashboard: React.FC = () => {
     getSocietyData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -35,7 +47,6 @@ const Dashboard: React.FC = () => {
       setFormData((prev) => ({ ...prev, image: file }));
     }
   };
-  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,10 +57,20 @@ const Dashboard: React.FC = () => {
   if (!society || society.name === null) {
     return (
       <div className="p-8 bg-gray-100 min-h-screen flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Onboarding Form</h1>
-        <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          Onboarding Form
+        </h1>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg"
+        >
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="name">Society Name</label>
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2"
+              htmlFor="name"
+            >
+              {user ? "Society Name" : "Name"}
+            </label>
             <input
               type="text"
               id="name"
@@ -61,7 +82,12 @@ const Dashboard: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="description">Description</label>
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2"
+              htmlFor="description"
+            >
+              Description
+            </label>
             <textarea
               id="description"
               name="description"
@@ -73,7 +99,12 @@ const Dashboard: React.FC = () => {
             ></textarea>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="image">Upload Image</label>
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2"
+              htmlFor="image"
+            >
+              Upload Image
+            </label>
             <input
               type="file"
               id="image"
@@ -84,7 +115,12 @@ const Dashboard: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="tags">Tags</label>
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2"
+              htmlFor="tags"
+            >
+              Tags
+            </label>
             <input
               type="text"
               id="tags"
@@ -108,10 +144,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Society Dashboard</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        Society Dashboard
+      </h1>
       {/* Render society details here */}
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800">Welcome to {society.name}</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Welcome to {society.name}
+        </h2>
         {/* Add more society details here */}
       </div>
     </div>
