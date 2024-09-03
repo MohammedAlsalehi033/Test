@@ -7,7 +7,7 @@ const auth = getAuth();
 export const initializeUser = async (type: string, email: string) => {
 
   try {
-    const usersCollection = collection(db, "Users");
+    const usersCollection = collection(db, "user");
 
     const q = query(usersCollection, where("email", "==", email));
     const querySnapshot = await getDocs(q);

@@ -4,19 +4,25 @@ import { collection, query, where, getDocs, updateDoc, setDoc } from "firebase/f
 
 const auth = getAuth();
 
-export const updateSubscribedSocieties = async (userEmail: string, socityId: string, requestState: string) => {
+export const updateSubscribedSocieties = async (userEmail: string, socityEmail: string, requestState: string) => {
   try {
     const userCollectionRef = collection(db, "user");
-    const q = query(userCollectionRef, where("email", "==", userEmail));
+    const qUser = query(userCollectionRef, where("email", "==", userEmail));
 
-    const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      const userDocRef = querySnapshot.docs[0].ref;
-      const userData = querySnapshot.docs[0].data();
+    const societiesCollectionRef = collection(db, "society");
+    const qSociety = query(userCollectionRef, where("email", "==", socityEmail));
+
+
+    const querySnapshotUser = await getDocs(qUser);
+    const querySnapshotSociety = await getDocs(qUser);
+
+    if (!querySnapshotUser.empty) {
+      const userDocRef = querySnapshotUser.docs[0].ref;
+      const userData = querySnapshotUser.docs[0].data();
       const currentSubscribedSocieties = userData.subscribedSocieties || {};
 
-      currentSubscribedSocieties[socityId] = requestState;
+      currentSubscribedSocieties[socityEmail] = requestState;
 
       await updateDoc(userDocRef, {
         subscribedSocieties: currentSubscribedSocieties,
@@ -26,6 +32,25 @@ export const updateSubscribedSocieties = async (userEmail: string, socityId: str
     } else {
       console.log("No user found with the provided email!");
     }
+
+
+    if (!querySnapshotUser.empty) {
+        const userDocRef = querySnapshotUser.docs[0].ref;
+        const userData = querySnapshotUser.docs[0].data();
+        const currentSubscribedSocieties = userData.subscribedSocieties || {};
+  
+        currentSubscribedSocieties[socityEmail] = requestState;
+  
+        await updateDoc(userDocRef, {
+          subscribedSocieties: currentSubscribedSocieties,
+        });
+  
+        console.log("User's subscribed societies updated successfully");
+      } else {
+        console.log("No user found with the provided email!");
+      }
+
+
   } catch (e) {
     console.error("Error updating subscribed societies: ", e);
   }
