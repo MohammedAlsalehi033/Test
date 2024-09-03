@@ -7,29 +7,52 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig"; // Assuming firebaseConfig exports the initialized Firebase auth instance
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/Hooks/useAuth";
+import { initializeUser } from "@/actions/initalizeUser";
+import { getUserById } from "@/actions/getUserByID";
 
 export default function Login() {
   const [step, setStep] = useState(0);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const provider = new GoogleAuthProvider();
   const router = useRouter();
-  const user = useAuth(auth); // Use custom useAuth hook
+  const user = useAuth(auth);
 
   useEffect(() => {
     if (user !== undefined) {
-      setLoading(false); // Stop loading when the user is determined
+      setLoading(false);
       if (user) {
-        router.push("/user-dashboard"); // Redirect to dashboard if logged in
+        if (user?.email) {
+          getUserById(user.email).then((userData) => {
+            if (userData) {
+              router.push("/user-dashboard");
+            } else {
+              router.push("/admin-dashboard");
+            }
+          });
+        }
       }
     }
   }, [user, router]);
 
+  const handleUserCreation = async (type: string, user: any) => {
+    try {
+      await initializeUser(type, user.email);
+      if (type === "admin") {
+        router.push("/admin-dashboard");
+      } else {
+        router.push("/user-dashboard");
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  };
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log("User Info:", result.user);
-      router.push("/user-dashboard"); // Redirect after successful login
+      const user = result.user;
+      const type = step === 1 ? "admin" : "user";
+      await handleUserCreation(type, user);
     } catch (error) {
       console.error("Error during Google login:", error);
       setLoading(false); // Stop loading if there's an error
