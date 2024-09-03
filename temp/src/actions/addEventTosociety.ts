@@ -8,10 +8,7 @@ export const addEventToSociety = async (
   userEmail: string,
   newEvent: string
 ) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
+
 
   try {
     const societyCollectionRef = collection(db, "society");

@@ -7,10 +7,7 @@ const auth = getAuth();
 export const joinSocity = async (
   socityRequestStates: Record<string, string> 
 ) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
+
 
   const userDoc = {
     socityRequestStates  
@@ -18,7 +15,7 @@ export const joinSocity = async (
 
   try {
     const docRef = collection(db, "user");
-    await addDoc(docRef, socityDoc);
+    await addDoc(docRef, userDoc);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);

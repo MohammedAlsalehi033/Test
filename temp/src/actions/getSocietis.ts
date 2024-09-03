@@ -1,7 +1,7 @@
 import { string } from './../../node_modules/@types/prop-types/index.d';
 import { db } from "../lib/firebaseConfig";
 import { getAuth } from "firebase/auth";
-import { collection, getDocs,getDoc } from "firebase/firestore";
+import { collection, getDocs,getDoc, query, where } from "firebase/firestore";
 
 
 interface Club {
@@ -38,20 +38,20 @@ export const getAllSocieties = async (): Promise<Club[]> => {
 };
 
 
-
-export const getAllSocietiesByID = async (email: string ) => {
+export const getSocietiesByID = async (email: string) => {
     const user = auth.currentUser;
-  
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
   
     try {
       const societiesCollection = collection(db, "society");
-      const societiesSnapshot = await getDoc(societiesCollection,);
-
+      const q = query(societiesCollection, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
   
-      return societiesSnapshot;
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.error("Error fetching societies: ", e);
       throw e;
     }
   };
-  

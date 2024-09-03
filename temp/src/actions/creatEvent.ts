@@ -12,10 +12,7 @@ export const initializeEvents = async (
   description: string,
   img: string[]
 ) => {
-  const user = auth.currentUser;
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
+
   const time = new Date().getTime();
 
   const eventDoc = {
