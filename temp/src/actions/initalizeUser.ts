@@ -4,7 +4,7 @@ import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const auth = getAuth();
 
-export const initializeUser = async (name: string) => {
+export const initializeUser = async (type: string) => {
   const user = auth.currentUser;
   if (!user) {
     throw new Error("User not authenticated");
@@ -26,12 +26,13 @@ export const initializeUser = async (name: string) => {
     // If the user doesn't exist, create a new document
     const userDoc = {
       email: user.email,
-      name: name,
+      type,
       createdAt: new Date(),
     };
 
     const docRef = await addDoc(usersCollection, userDoc);
     console.log("Document written with ID: ", docRef.id);
+    
   } catch (e) {
     console.error("Error adding document: ", e);
   }

@@ -1,17 +1,11 @@
-import { db } from "../lib/firebaseConfig";
+import { db } from "@/lib/firebaseConfig";
 import { getAuth } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 
 const auth = getAuth();
 
-export const initializeSocity = async (
-  email: string,
-  name: string,
-  users: Record<string, string>,
-  events: string[],
-  description: string,
-  tags: string[],
-  img: string[]
+export const leaveSocity = async (
+  socityRequestStates: Record<string, string> 
 ) => {
   const user = auth.currentUser;
   if (!user) {
@@ -19,17 +13,11 @@ export const initializeSocity = async (
   }
 
   const socityDoc = {
-    name,
-    email,
-    users,
-    events,
-    description,
-    tags,
-    img,
+    socityRequestStates  
   };
 
   try {
-    const docRef = collection(db, "society");
+    const docRef = collection(db, "user");
     await addDoc(docRef, socityDoc);
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
