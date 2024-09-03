@@ -1,28 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Stepper, Step } from "@/components/Stepper";
 import { Button } from "@/components/ui/button";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "@/lib/firebaseConfig";
+import { auth } from "@/lib/firebaseConfig"; // Assuming firebaseConfig exports the initialized Firebase auth instance
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/Hooks/useAuth";
 
 export default function Login() {
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(true); // Loading state
   const provider = new GoogleAuthProvider();
   const router = useRouter();
+  const user = useAuth(auth); // Use custom useAuth hook
+
+  useEffect(() => {
+    if (user !== undefined) {
+      setLoading(false); // Stop loading when the user is determined
+      if (user) {
+        router.push("/user-dashboard"); // Redirect to dashboard if logged in
+      }
+    }
+  }, [user, router]);
 
   const handleGoogleLogin = async () => {
+    setLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      console.log("User Info:", user);
+      console.log("User Info:", result.user);
+      router.push("/user-dashboard"); // Redirect after successful login
     } catch (error) {
       console.error("Error during Google login:", error);
+      setLoading(false); // Stop loading if there's an error
     }
   };
- 
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        {/* Spinner or loading indicator */}
+        <div className="loader">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-black flex flex-col justify-center items-center">
