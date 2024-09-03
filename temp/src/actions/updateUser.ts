@@ -1,37 +1,30 @@
 import { db } from "@/lib/firebaseConfig";
 import { getAuth } from "firebase/auth";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc, setDoc } from "firebase/firestore";
 
 const auth = getAuth();
 
-export const updateSubscribedSocieties = async (socityId: string, requestState: string) => {
-
+export const updateSubscribedSocieties = async (userEmail: string, socityId: string, requestState: string) => {
   try {
-    const userDocRef = doc(collection(db, "Users"), user.uid);
+    const userCollectionRef = collection(db, "user");
+    const q = query(userCollectionRef, where("email", "==", userEmail));
 
-    const userDocSnapshot = await getDoc(userDocRef);
+    const querySnapshot = await getDocs(q);
 
-    if (userDocSnapshot.exists()) {
-      const userData = userDocSnapshot.data();
+    if (!querySnapshot.empty) {
+      const userDocRef = querySnapshot.docs[0].ref;
+      const userData = querySnapshot.docs[0].data();
       const currentSubscribedSocieties = userData.subscribedSocieties || {};
 
       currentSubscribedSocieties[socityId] = requestState;
 
       await updateDoc(userDocRef, {
-        subscribedSocieties: currentSubscribedSocieties
+        subscribedSocieties: currentSubscribedSocieties,
       });
 
       console.log("User's subscribed societies updated successfully");
     } else {
-      const newSubscribedSocieties = {
-        [socityId]: requestState
-      };
-
-      await setDoc(userDocRef, {
-        subscribedSocieties: newSubscribedSocieties
-      });
-
-      console.log("User document created and subscribed societies updated");
+      console.log("No user found with the provided email!");
     }
   } catch (e) {
     console.error("Error updating subscribed societies: ", e);
