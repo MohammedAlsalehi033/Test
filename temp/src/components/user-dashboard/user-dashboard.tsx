@@ -22,14 +22,9 @@ interface Event {
 const Dashboard: React.FC = ({}) => {
   const user = useAuth(auth);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [loading, setLoading] = useState(true); // Initialize loading to true
   const router = useRouter();
   console.log(user);
-
-  useEffect(() => {
-    if (user === undefined) {
-      router.push("/login");
-    }
-  }, [user, router]);
 
   const handleLogout = async () => {
     try {
@@ -40,10 +35,21 @@ const Dashboard: React.FC = ({}) => {
     }
   };
 
-  if (user === null) {
+  useEffect(() => {
+    if (user === undefined) {
+      setLoading(true); // Keep loading if user is still being fetched
+    } else if (user === null) {
+      router.push("/login"); // Redirect to login if user is null (logged out)
+    } else {
+      setLoading(false); // Stop loading once user is fetched
+    }
+  }, [user, router]);
+
+  // Render loading screen while loading is true
+  if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <div className="loader">Loading...</div>
+        <div className="loader">Loading...</div>{" "}
       </div>
     );
   }
